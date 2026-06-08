@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Front Row — never miss your artists live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ----------------------------------------------------------------
+     COLOURS & TYPE
+  ---------------------------------------------------------------- */
+  :root{
+    --ink:#17121f;
+    --ink-2:#211829;
+    --cream:#f6efe4;
+    --marigold:#ffb22e;
+    --coral:#ff5d52;
+    --muted:rgba(246,239,228,.58);
+    --line:rgba(246,239,228,.14);
+    --radius:18px;
+    --display:"Fraunces",Georgia,serif;
+    --body:"Hanken Grotesk",-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--body);
+    background:var(--ink);
+    color:var(--cream);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+  /* atmospheric glow + grain */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(60% 50% at 80% -5%, rgba(255,178,46,.16), transparent 60%),
+      radial-gradient(50% 45% at 5% 100%, rgba(255,93,82,.14), transparent 60%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:clamp(28px,6vw,64px) 22px 64px}
+
+  /* ----------------------------------------------------------------
+     HERO
+  ---------------------------------------------------------------- */
+  .brand{
+    display:inline-flex;align-items:center;gap:9px;
+    font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    font-size:.72rem;color:var(--marigold);
+    border:1px solid var(--line);border-radius:999px;
+    padding:7px 14px;margin-bottom:34px;
+    animation:rise .7s ease both;
+  }
+  .brand .dot{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 10px var(--coral)}
+  h1{
+    font-family:var(--display);
+    font-weight:900;
+    font-size:clamp(2.6rem,9vw,4.6rem);
+    line-height:.96;letter-spacing:-.02em;
+    margin-bottom:20px;
+    animation:rise .7s .06s ease both;
+  }
+  h1 em{font-style:italic;color:var(--marigold)}
+  .lede{
+    font-size:clamp(1.05rem,2.6vw,1.25rem);
+    color:var(--muted);max-width:30ch;margin-bottom:38px;
+    animation:rise .7s .12s ease both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+  /* ----------------------------------------------------------------
+     TICKET CARD
+  ---------------------------------------------------------------- */
+  .ticket{
+    position:relative;background:var(--ink-2);
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:clamp(24px,5vw,38px);
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.7);
+    animation:rise .7s .18s ease both;
+  }
+  /* perforation notches */
+  .ticket::before,.ticket::after{
+    content:"";position:absolute;top:50%;width:24px;height:24px;
+    background:var(--ink);border-radius:50%;transform:translateY(-50%);
+  }
+  .ticket::before{left:-13px}
+  .ticket::after{right:-13px}
+
+  .step-label{
+    font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--marigold);font-weight:700;margin-bottom:8px;display:block;
+  }
+  .ticket h2{font-family:var(--display);font-size:1.5rem;font-weight:600;margin-bottom:18px}
+
+  .field{display:flex;gap:10px;margin-bottom:14px}
+  input[type=text]{
+    flex:1;background:rgba(246,239,228,.04);color:var(--cream);
+    border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;font-family:var(--body);font-size:1rem;
+    transition:border-color .2s,background .2s;
+  }
+  input[type=text]:focus{outline:none;border-color:var(--marigold);background:rgba(255,178,46,.06)}
+  input::placeholder{color:rgba(246,239,228,.35)}
+
+  .btn{
+    border:none;cursor:pointer;font-family:var(--body);font-weight:700;
+    border-radius:12px;transition:transform .15s,box-shadow .2s,opacity .2s;
+  }
+  .btn:active{transform:translateY(1px) scale(.99)}
+  .add-btn{
+    background:rgba(246,239,228,.08);color:var(--cream);
+    padding:0 20px;font-size:1.4rem;line-height:1;border:1px solid var(--line);
+  }
+  .add-btn:hover{background:rgba(255,178,46,.16);border-color:var(--marigold)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 22px;min-height:4px}
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,178,46,.12);border:1px solid rgba(255,178,46,.4);
+    color:var(--cream);border-radius:999px;padding:7px 8px 7px 14px;
+    font-size:.92rem;font-weight:500;
+    animation:pop .25s ease both;
+  }
+  @keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+  .chip button{
+    background:rgba(246,239,228,.12);border:none;color:var(--cream);
+    width:20px;height:20px;border-radius:50%;cursor:pointer;
+    font-size:.85rem;line-height:1;display:grid;place-items:center;
+  }
+  .chip button:hover{background:var(--coral)}
+
+  .consent{display:flex;gap:11px;align-items:flex-start;margin:6px 0 22px;font-size:.9rem;color:var(--muted)}
+  .consent input{margin-top:3px;width:17px;height:17px;accent-color:var(--marigold);flex-shrink:0}
+
+  .submit{
+    width:100%;background:var(--marigold);color:#2a1c05;
+    padding:16px;font-size:1.05rem;
+    box-shadow:0 14px 30px -12px rgba(255,178,46,.6);
+  }
+  .submit:hover{box-shadow:0 18px 38px -10px rgba(255,178,46,.75)}
+  .submit:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+  .note{font-size:.82rem;color:var(--muted);margin-top:14px;text-align:center}
+  .error{color:var(--coral);font-size:.86rem;margin-bottom:14px;display:none}
+  .error.show{display:block}
+
+  /* telegram step (hidden until submit) */
+  .done{display:none;text-align:center}
+  .done.show{display:block;animation:rise .5s ease both}
+  .done .tick{font-size:2.4rem;margin-bottom:8px}
+  .tg-btn{
+    display:inline-flex;align-items:center;gap:10px;justify-content:center;
+    width:100%;background:#229ED9;color:#fff;padding:16px;font-size:1.05rem;
+    text-decoration:none;margin-top:18px;
+    box-shadow:0 14px 30px -12px rgba(34,158,217,.7);
+  }
+  .tg-btn:hover{box-shadow:0 18px 38px -10px rgba(34,158,217,.85)}
+
+  /* ----------------------------------------------------------------
+     HOW IT WORKS
+  ---------------------------------------------------------------- */
+  .how{margin-top:54px;animation:rise .7s .24s ease both}
+  .how h3{font-family:var(--display);font-size:1.25rem;font-weight:600;margin-bottom:20px}
+  .steps{display:grid;gap:16px}
+  .stepc{display:flex;gap:16px;align-items:flex-start}
+  .num{
+    font-family:var(--display);font-weight:900;font-size:1.3rem;
+    color:var(--marigold);border:1px solid var(--line);border-radius:12px;
+    width:44px;height:44px;display:grid;place-items:center;flex-shrink:0;
+  }
+  .stepc p{font-size:.96rem;color:var(--muted)}
+  .stepc strong{color:var(--cream);font-weight:600}
+
+  footer{
+    margin-top:54px;padding-top:24px;border-top:1px solid var(--line);
+    font-size:.8rem;color:var(--muted);text-align:center;line-height:1.7;
+  }
+  footer .soon{color:var(--marigold);font-weight:600}
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- HERO -->
+    <span class="brand"><span class="dot"></span>Front Row</span>
+    <h1>Never miss your<br>artists <em>live</em> again.</h1>
+    <p class="lede">Pick the South African artists you love. We watch every major ticket site and message you the moment a new show drops.</p>
+
+    <!-- SIGN-UP TICKET -->
+    <section class="ticket" aria-label="Sign up">
+      <div id="form-view">
+        <span class="step-label">Step 1 — your line-up</span>
+        <h2>Who do you want to catch live?</h2>
+
+        <div class="field">
+          <input type="text" id="artist-input" placeholder="e.g. Joyous Celebration" autocomplete="off" />
+          <button class="btn add-btn" id="add-btn" aria-label="Add artist">+</button>
+        </div>
+        <div class="chips" id="chips" aria-live="polite"></div>
+
+        <label class="consent">
+          <input type="checkbox" id="consent" />
+          <span>Yes, send me concert alerts for these artists. I can stop anytime by blocking the bot on Telegram.</span>
+        </label>
+
+        <p class="error" id="error"></p>
+        <button class="btn submit" id="submit" disabled>Continue to Telegram</button>
+        <p class="note">Free forever. We only store your chosen artists — no phone number, no email.</p>
+      </div>
+
+      <!-- shown after submit -->
+      <div class="done" id="done-view">
+        <div class="tick">🎟️</div>
+        <span class="step-label">Step 2 — connect</span>
+        <h2>One tap and you're in</h2>
+        <p style="color:var(--muted);font-size:.95rem">Open our Telegram bot and press <strong style="color:var(--cream)">Start</strong>. That links your line-up and switches on your alerts.</p>
+        <a class="btn tg-btn" id="tg-link" href="#" target="_blank" rel="noopener">Open Telegram &amp; finish →</a>
+        <p class="note">Didn't have Telegram? It's a free app — install it, then tap the button again.</p>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <div class="how">
+      <h3>How it works</h3>
+      <div class="steps">
+        <div class="stepc"><div class="num">1</div><p><strong>Add your artists.</strong> Local gospel, amapiano, rock — whoever you don't want to miss.</p></div>
+        <div class="stepc"><div class="num">2</div><p><strong>Connect on Telegram.</strong> That's your sign-in and your "yes, message me" in one tap.</p></div>
+        <div class="stepc"><div class="num">3</div><p><strong>Get alerts.</strong> Every morning we scan the ticket sites and ping you about new shows — before the good seats vanish.</p></div>
+      </div>
+    </div>
+
+    <footer>
+      We keep only the artists you choose and your Telegram chat, used purely to send your alerts — never shared.<br>
+      <span class="soon">SMS &amp; WhatsApp coming soon.</span>
+    </footer>
+
+  </div>
+
+<script>
+  /* ================================================================
+     CONFIG — fill these two in once the back-end pieces are set up.
+     (We'll do that together in the next steps.)
+  ================================================================ */
+  const BOT_USERNAME    = "YOUR_BOT_USERNAME";          // e.g. "frontrow_alerts_bot" (no @)
+  const STORAGE_URL     = "PASTE_YOUR_STORAGE_LINK_HERE"; // the Google Script web-app link (set up next)
+  /* ================================================================ */
+
+  const artists = [];
+  const input   = document.getElementById("artist-input");
+  const addBtn  = document.getElementById("add-btn");
+  const chipsEl = document.getElementById("chips");
+  const consent = document.getElementById("consent");
+  const submit  = document.getElementById("submit");
+  const errorEl = document.getElementById("error");
+
+  function refresh(){
+    chipsEl.innerHTML = "";
+    artists.forEach((name, i) => {
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.innerHTML = `${escapeHtml(name)} <button aria-label="Remove ${escapeHtml(name)}">×</button>`;
+      chip.querySelector("button").onclick = () => { artists.splice(i,1); refresh(); };
+      chipsEl.appendChild(chip);
+    });
+    submit.disabled = !(artists.length > 0 && consent.checked);
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  function addArtist(){
+    const name = input.value.trim();
+    if(!name) return;
+    if(artists.some(a => a.toLowerCase() === name.toLowerCase())){ input.value=""; return; }
+    if(artists.length >= 15){ showError("That's plenty of artists to start with!"); return; }
+    artists.push(name);
+    input.value = "";
+    input.focus();
+    errorEl.classList.remove("show");
+    refresh();
+  }
+
+  function showError(msg){ errorEl.textContent = msg; errorEl.classList.add("show"); }
+
+  addBtn.onclick = addArtist;
+  input.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); addArtist(); } });
+  consent.addEventListener("change", refresh);
+
+  function makeToken(){
+    if(window.crypto && crypto.randomUUID) return crypto.randomUUID().replace(/-/g,"").slice(0,16);
+    return Math.random().toString(36).slice(2,12) + Date.now().toString(36);
+  }
+
+  submit.onclick = async () => {
+    if(artists.length === 0){ showError("Add at least one artist first."); return; }
+    if(!consent.checked){ showError("Please tick the box so we can send your alerts."); return; }
+
+    const token = makeToken();
+    submit.disabled = true;
+    submit.textContent = "Setting up…";
+
+    // Save the sign-up (artists + token) to storage. Wired up in the next step;
+    // if it's not set yet, we still proceed so the page is testable.
+    try{
+      if(STORAGE_URL && !STORAGE_URL.startsWith("PASTE_")){
+        await fetch(STORAGE_URL, {
+          method:"POST",
+          headers:{"Content-Type":"text/plain;charset=utf-8"}, // avoids CORS preflight with Google Script
+          body: JSON.stringify({ token, artists })
+        });
+      }
+    }catch(err){ /* ignore for now — the Telegram step still works */ }
+
+    // Reveal the Telegram connect step with a deep link carrying the token.
+    document.getElementById("tg-link").href = "https://t.me/" + BOT_USERNAME + "?start=" + token;
+    document.getElementById("form-view").style.display = "none";
+    document.getElementById("done-view").classList.add("show");
+  };
+</script>
+</body>
+</html>
