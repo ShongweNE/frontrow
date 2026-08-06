@@ -164,6 +164,36 @@
   }
   .tg-btn:hover{box-shadow:0 18px 38px -10px rgba(34,158,217,.85)}
 
+  .code-box{
+    background:rgba(246,239,228,.04);
+    border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;margin-top:20px;text-align:left;
+  }
+  .code-label{
+    font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--marigold);font-weight:700;display:block;margin-bottom:8px;
+  }
+  .code-row{display:flex;align-items:center;gap:10px}
+  .code-value{
+    flex:1;font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:1.15rem;letter-spacing:.06em;color:var(--cream);
+    background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;overflow-x:auto;white-space:nowrap;
+  }
+  .copy-btn{
+    background:rgba(255,93,82,.14);color:var(--coral);
+    border:1px solid rgba(255,93,82,.4);
+    padding:10px 16px;font-size:.85rem;flex-shrink:0;
+  }
+  .copy-btn:hover{background:rgba(255,93,82,.24)}
+  .copy-btn.copied{background:var(--marigold);color:#2a1c05;border-color:var(--marigold)}
+  .code-inline{
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:6px;
+    padding:2px 6px;color:var(--cream);font-size:.85em;
+  }
+  .tg-help-link{color:var(--marigold);text-decoration:underline}
+
   /* ----------------------------------------------------------------
      HOW IT WORKS
   ---------------------------------------------------------------- */
@@ -222,8 +252,17 @@
         <span class="step-label">Step 2 — connect</span>
         <h2>One tap and you're in</h2>
         <p style="color:var(--muted);font-size:.95rem">Open our Telegram bot and press <strong style="color:var(--cream)">Start</strong>. That links your line-up and switches on your alerts.</p>
-        <a class="btn tg-btn" id="tg-link" href="#" target="_blank" rel="noopener">Open Telegram &amp; finish →</a>
-        <p class="note">Didn't have Telegram? It's a free app — install it, then tap the button again.</p>
+
+        <div class="code-box">
+          <span class="code-label">Your code:</span>
+          <div class="code-row">
+            <code class="code-value" id="tg-code"></code>
+            <button class="btn copy-btn" id="copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+
+        <a class="btn tg-btn" id="tg-link" href="#" rel="noopener">Open Telegram &amp; finish →</a>
+        <p class="note">Don't have Telegram? Get it at <a href="https://telegram.org/" target="_blank" rel="noopener" class="tg-help-link">telegram.org</a>, then come back and tap the button. Already opened the bot? Send it this code: <code class="code-inline" id="tg-code-2"></code></p>
       </div>
     </section>
 
@@ -260,6 +299,28 @@
   const consent = document.getElementById("consent");
   const submit  = document.getElementById("submit");
   const errorEl = document.getElementById("error");
+  const tgLink  = document.getElementById("tg-link");
+  const copyBtn = document.getElementById("copy-btn");
+
+  let currentToken = "";
+
+  tgLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const deepLink = "tg://resolve?domain=" + BOT_USERNAME + "&start=" + currentToken;
+    const webLink  = "https://t.me/" + BOT_USERNAME + "?start=" + currentToken;
+    window.location.href = deepLink;
+    setTimeout(() => { window.location.href = webLink; }, 700);
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    try{
+      await navigator.clipboard.writeText(currentToken);
+      const original = copyBtn.textContent;
+      copyBtn.textContent = "Copied!";
+      copyBtn.classList.add("copied");
+      setTimeout(() => { copyBtn.textContent = original; copyBtn.classList.remove("copied"); }, 1500);
+    }catch(err){ /* clipboard not available */ }
+  });
 
   function refresh(){
     chipsEl.innerHTML = "";
@@ -305,6 +366,7 @@
     if(!consent.checked){ showError("Please tick the box so we can send your alerts."); return; }
 
     const token = makeToken();
+    currentToken = token;
     submit.disabled = true;
     submit.textContent = "Setting up…";
 
@@ -321,7 +383,9 @@
     }catch(err){ /* ignore for now — the Telegram step still works */ }
 
     // Reveal the Telegram connect step with a deep link carrying the token.
-    document.getElementById("tg-link").href = "https://t.me/" + BOT_USERNAME + "?start=" + token;
+    tgLink.href = "https://t.me/" + BOT_USERNAME + "?start=" + token;
+    document.getElementById("tg-code").textContent = token;
+    document.getElementById("tg-code-2").textContent = token;
     document.getElementById("form-view").style.display = "none";
     document.getElementById("done-view").classList.add("show");
   };
